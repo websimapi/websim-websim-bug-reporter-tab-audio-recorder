@@ -72,16 +72,22 @@ async function startRecording() {
 
   try {
     updateStatus('Requesting tab + audio...');
-    // Important: select a specific tab to capture tab audio.
+    if (!navigator.mediaDevices?.getDisplayMedia) throw new Error('UNSUPPORTED:getDisplayMedia');
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: {
-        displaySurface: 'browser', // hint to pick a tab
+        displaySurface: 'browser',
         frameRate: 30,
         width: { ideal: 1920 },
         height: { ideal: 1080 },
+        preferCurrentTab: true
       },
-      audio: true, // tab audio if a tab is picked
-      // Note: Some browsers support advanced audio constraints; we keep it simple for compatibility.
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        sampleRate: 48000,
+        suppressLocalAudioPlayback: true,
+        selfBrowserSurface: 'include'
+      }
     });
 
     // When the user stops sharing via browser UI, stop recording gracefully.
@@ -131,7 +137,15 @@ async function startRecording() {
     recorder.start(1000); // collect data every second
   } catch (err) {
     console.error(err);
-    updateStatus('Permission denied or capture failed');
+    let msg = 'Permission denied or capture failed';
+    const proto = location.protocol;
+    if (String(err).includes('UNSUPPORTED')) msg = 'This browser does not support screen capture. Use Chrome, Edge, or Firefox.';
+    else if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') msg = 'Capture was blocked or cancelled. Pick a specific tab and check “Share tab audio”.';
+    else if (err?.name === 'NotFoundError') msg = 'No capture sources found. On macOS, enable Screen Recording in System Settings > Privacy & Security.';
+    else if (err?.name === 'AbortError') msg = 'Capture picker was closed. Try again.';
+    if (proto !== 'https:') msg = 'Screen capture requires HTTPS. Open this page over https://';
+    updateStatus(msg);
+    alert(msg);
     els.start.disabled = false;
     els.stop.disabled = true;
     stopTimer();
@@ -251,4 +265,3 @@ const updatePackageBtn = () => {
 ['bugTitle','bugDescription','expected','actual'].forEach(id => {
   document.getElementById(id).addEventListener('input', updatePackageBtn);
 });
-
