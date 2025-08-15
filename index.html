@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WebSim Bug Reporter – Tab + Audio Recorder</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <meta name="color-scheme" content="light dark">
+</head>
+<body>
+  <header class="wrap">
+    <h1>WebSim Bug Reporter</h1>
+    <p class="sub">Record any browser tab with that tab’s audio. Package the video with a detailed README.md.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>1) Describe the bug</h2>
+      <div class="grid">
+        <label class="field">
+          <span class="label">Bug title (short, descriptive)</span>
+          <input id="bugTitle" type="text" placeholder="e.g., Homepage fails to load on Chrome 126" maxlength="120" />
+        </label>
+        <label class="field">
+          <span class="label">Category</span>
+          <select id="bugCategory">
+            <option>Homepage load</option>
+            <option>Editor/Project</option>
+            <option>Playback/Preview</option>
+            <option>Export/Download</option>
+            <option>Account/Auth</option>
+            <option>Other</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span class="label">What’s happening? Include steps if you can.</span>
+        <textarea id="bugDescription" rows="5" placeholder="1) Go to websim.ai
+2) Click Sign In
+3) White screen, spinner never ends..." maxlength="4000"></textarea>
+      </label>
+      <details class="details">
+        <summary>Optional: Expected vs Actual</summary>
+        <div class="grid">
+          <label class="field">
+            <span class="label">Expected behavior</span>
+            <textarea id="expected" rows="3" placeholder="Describe what you expected to happen"></textarea>
+          </label>
+          <label class="field">
+            <span class="label">Actual behavior</span>
+            <textarea id="actual" rows="3" placeholder="Describe what actually happened"></textarea>
+          </label>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>2) Record the tab + audio</h2>
+      <p class="muted">Click “Start Recording” then select the specific browser tab you want to capture. To include tab audio, choose a tab in the picker (not your full screen) and ensure audio sharing is enabled in the permission dialog.</p>
+
+      <div class="controls">
+        <button id="startBtn" class="btn">Start Recording</button>
+        <button id="stopBtn" class="btn danger" disabled>Stop</button>
+        <span id="status" class="status">Idle</span>
+        <span id="timer" class="timer" aria-live="polite">00:00</span>
+      </div>
+
+      <div class="preview" id="previewWrap" hidden>
+        <video id="preview" controls playsinline></video>
+        <div class="meta">
+          <span id="sizeLabel" class="muted"></span>
+          <span id="durationLabel" class="muted"></span>
+        </div>
+      </div>
+
+      <details class="details">
+        <summary>Troubleshooting recording</summary>
+        <ul class="muted">
+          <li>If audio is missing, re-try and select a specific tab (not “Entire screen”).</li>
+          <li>On some systems, system audio can’t be captured. Tab audio usually works.</li>
+          <li>Keep this page open during recording.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>3) Package & download</h2>
+      <p class="muted">Bundles your video and an auto-generated README.md (with environment details) into a single ZIP.</p>
+      <div class="controls">
+        <button id="packageBtn" class="btn" disabled>Create ZIP</button>
+        <a id="downloadLink" class="btn ghost" href="#" download hidden>Download ZIP</a>
+      </div>
+      <div id="packageName" class="muted"></div>
+    </section>
+
+    <section class="card">
+      <h2>How to diagnose homepage load errors or other site-specific errors (not project errors)</h2>
+      <ol class="howto">
+        <li>Open Chrome. Download it if necessary.</li>
+        <li>Press Ctrl+Shift+C (or right-click → Inspect) to open DevTools.</li>
+        <li>Ensure the “Console” tab is active. It should resemble the first screenshot.</li>
+        <li>Start screen recording.</li>
+        <li>Go to websim and let the console log fill up if it happens.</li>
+        <li>From DevTools, switch to the “Network” tab (second screenshot).</li>
+        <li>You may need to resize the Network panel; it should resemble the third screenshot.</li>
+        <li>Refresh the WebSim tab.</li>
+        <li>DM me the video, or email it to support@websim.ai.</li>
+      </ol>
+      <p class="muted">Tip: Use this recorder to capture just the WebSim tab with its audio, then attach the resulting ZIP.</p>
+    </section>
+
+    <section class="card">
+      <h2>Privacy</h2>
+      <p class="muted">All processing is done in your browser. Nothing is uploaded anywhere by this page. You control what you share.</p>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <span class="muted">Made for fast, actionable bug reports.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" integrity="sha384-V3n7f1YVYyqk2kP8G4vDqg4u3f0VP6RZrjT7LxG4Y3zHqq9bOaM1qf2sCR4vXy2S" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js" integrity="sha384-1Y5sQpQpN8h8fQHc6bG8mCRo6b3Q4X5oZ2X3n3bQFqVJr2e5n6nVb2S4Jm8Yq2iQ" crossorigin="anonymous"></script>
+
+  <script type="module" src="./app.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
